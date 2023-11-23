@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NoWarn>CS0169;CS0414</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--<RoslynVersion>3.11</RoslynVersion>-->
+    <!--<RoslynLibVersion>3.11.0</RoslynLibVersion>-->
+
+    <!--<RoslynVersion>4.0</RoslynVersion>-->
+    <!--<RoslynLibVersion>4.0.1</RoslynLibVersion>-->
+
+    <RoslynVersion>4.4</RoslynVersion>
+    <RoslynLibVersion>4.4.0</RoslynLibVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RoslynVersion)' == '3.11' ">
+    <DefineConstants>$(DefineConstants);ROSLYN_3_11</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RoslynVersion)' == '4.0' ">
+    <DefineConstants>$(DefineConstants);ROSLYN_4_0</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RoslynVersion)' == '4.4' ">
+    <DefineConstants>$(DefineConstants);ROSLYN_4_4</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Examples\*.cs" />
+    <None Include="Examples\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!--<PackageReference Include="MarkdownSnippets.MsBuild" Version="25.1.0" PrivateAssets="all" />-->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Verify.SourceGenerators" Version="2.2.0" />
+    <PackageReference Include="Verify.Xunit" Version="22.5.0" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynLibVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(RoslynLibVersion)" />
+    <ProjectReference Include="..\Pocoman.Attributes\Pocoman.Attributes.csproj" />
+    <ProjectReference Include="..\Pocoman.Roslyn$(RoslynVersion)\Pocoman.Roslyn$(RoslynVersion).csproj" />
+  </ItemGroup>
+
+</Project>

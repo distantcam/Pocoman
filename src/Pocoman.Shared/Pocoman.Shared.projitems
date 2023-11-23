@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>dbee8eb0-9ef4-44bc-b027-d835b20e02f1</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Pocoman.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)helpers\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GeneratorUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)helpers\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)models\EquatableList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)models\TypeModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Emitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Parser.cs" />
+  </ItemGroup>
+</Project>

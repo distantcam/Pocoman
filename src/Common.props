@@ -1,0 +1,27 @@
+<Project>
+
+  <PropertyGroup>
+    <AssemblyName>Pocoman</AssemblyName>
+    <RootNamespace>Pocoman</RootNamespace>
+
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IsRoslynComponent>true</IsRoslynComponent>
+
+    <Version>0.0.0</Version>
+    <GitSha>abc</GitSha>
+    <PackageProjectUrl>https://github.com/distantcam/pocoman</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="GitSha" Value="$(GitSha)" />
+    <AssemblyMetadata Include="PackageProjectUrl" Value="$(PackageProjectUrl)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Import Project="Pocoman.Shared\Pocoman.Shared.projitems" Label="Shared" />
+
+</Project>

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Pocoman</RootNamespace>
+
+    <Version>0.0.0</Version>
+    <PackageProjectUrl>https://github.com/distantcam/pocoman</PackageProjectUrl>
+
+    <GeneratePackageOnBuild Condition="$(Configuration) == 'Release'">true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Pocoman</PackageId>
+    <Authors>Cameron MacFarland</Authors>
+    <Description>
+      Source Generator to create fluent builders for POCOs.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(SolutionDir)\src\Pocoman.Roslyn4.4\bin\Release\netstandard2.0\Pocoman.dll">
+      <Pack>true</Pack>
+      <Visible>false</Visible>
+      <PackagePath>analyzers/dotnet/roslyn4.4/cs</PackagePath>
+    </None>
+  </ItemGroup>
+
+
+</Project>
