@@ -13,11 +13,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)helpers\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GeneratorUtilities.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)helpers\IsExternalInit.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)models\EquatableList.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)models\TypeModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\EquatableList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\TypeModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Emitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Parser.cs" />
   </ItemGroup>
