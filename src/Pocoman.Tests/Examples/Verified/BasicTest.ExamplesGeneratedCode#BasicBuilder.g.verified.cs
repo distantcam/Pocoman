@@ -54,4 +54,5 @@ public partial class BasicBuilder
 			build.Standard = _Standard;
 		return build;
 	}
+	public static implicit operator global::Basic(BasicBuilder builder) => builder.Build();
 }

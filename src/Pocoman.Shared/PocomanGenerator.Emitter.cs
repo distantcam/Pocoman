@@ -31,6 +31,8 @@ public sealed partial class PocomanGenerator
                     }
 
                     AddBuildMethod(source, type);
+
+                    AddImplicitOperator(source, type);
                 }
 
                 context.AddSource(type.HintName + ".g.cs", source);
@@ -94,6 +96,11 @@ public sealed partial class PocomanGenerator
 
                 source.AppendLine("return build;");
             }
+        }
+
+        private static void AddImplicitOperator(CodeBuilder source, TypeModel type)
+        {
+            source.AppendLine($"public static implicit operator {type.FullType}({type.Name} builder) => builder.Build();");
         }
     }
 }

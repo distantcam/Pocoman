@@ -17,4 +17,5 @@ public partial class NoGenerationBuilder
 		};
 		return build;
 	}
+	public static implicit operator global::NoGeneration(NoGenerationBuilder builder) => builder.Build();
 }

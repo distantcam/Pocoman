@@ -54,4 +54,5 @@ partial class ExternalBuilder
 			build.Standard = _Standard;
 		return build;
 	}
+	public static implicit operator global::External(ExternalBuilder builder) => builder.Build();
 }
