@@ -8,7 +8,7 @@ public sealed partial class PocomanGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var types = context.SyntaxProvider.ForAttributeWithMetadataName(
-            Parser.PocoAttributeFullName,
+            Parser.PocoBuilderAttributeFullName,
             Parser.IsTypeDeclaration,
             static (c, ct) => TypeModel.Create((INamedTypeSymbol)c.TargetSymbol, c.Attributes))
         .Collect();

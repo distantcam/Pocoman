@@ -39,6 +39,9 @@ public sealed partial class PocomanGenerator
 
         private static void AddProperty(CodeBuilder source, IPropertySymbol property, string builderName)
         {
+            if (property.SetMethod?.DeclaredAccessibility != Accessibility.Public)
+                return;
+
             var n = property.Name;
             var t = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
@@ -70,7 +73,7 @@ public sealed partial class PocomanGenerator
                     initers.Add($"{n} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
                 else if (prop.SetMethod?.IsInitOnly == true)
                     initers.Add($"{n} = _{n}_isSet ? _{n} : default");
-                else
+                else if (prop.SetMethod!.DeclaredAccessibility == Accessibility.Public)
                     otherSetters.Add(prop);
             }
 

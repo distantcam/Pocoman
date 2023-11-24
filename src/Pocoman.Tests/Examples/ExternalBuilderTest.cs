@@ -1,14 +1,14 @@
 ﻿using Pocoman;
 
-public class ExternalPerson
+public class External
 {
-    public required string Name { get; init; }
-    public string Address { get; init; }
-    public int Age { get; init; }
-    public string Nickname { get; set; }
+    public required string IsRequired { get; init; }
+    public string StringInit { get; init; }
+    public int NumberInit { get; init; }
+    public string Standard { get; set; }
 }
 
-[Poco(typeof(ExternalPerson))]
-internal partial class ExternalPersonBuilder
+[PocoBuilder(typeof(External))]
+internal partial class ExternalBuilder
 {
 }

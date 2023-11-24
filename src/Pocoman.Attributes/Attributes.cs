@@ -1,13 +1,13 @@
 ﻿namespace Pocoman;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-public sealed class PocoAttribute : Attribute
+public sealed class PocoBuilderAttribute : Attribute
 {
-    public PocoAttribute()
+    public PocoBuilderAttribute()
     {
     }
 
-    public PocoAttribute(Type builderType)
+    public PocoBuilderAttribute(Type builderType)
     {
     }
 }
