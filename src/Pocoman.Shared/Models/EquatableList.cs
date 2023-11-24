@@ -30,6 +30,6 @@ internal struct EquatableList<T> : IEquatable<EquatableList<T>>, IReadOnlyList<T
     public readonly int Count => _data.Length;
     public readonly T this[int index] => _data[index];
 
-    public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)_data).GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_data).GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => _data.IsDefault ? Enumerable.Empty<T>().GetEnumerator() : ((IEnumerable<T>)_data).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

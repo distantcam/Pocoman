@@ -13,7 +13,7 @@ public sealed partial class PocomanGenerator
 #elif ROSLYN_4_0 || ROSLYN_4_4
             SourceProductionContext context,
 #endif
-            ImmutableArray<INamedTypeSymbol> types)
+            ImmutableArray<TypeModel> types)
         {
             if (types.IsDefaultOrEmpty) return;
 
@@ -23,26 +23,17 @@ public sealed partial class PocomanGenerator
                     .AppendHeader()
                     .AppendLine();
 
-                if (!type.ContainingNamespace.IsGlobalNamespace)
+                using (source.StartPartialType(type))
                 {
-                    source.AppendLine($"namespace {type.ContainingNamespace}");
-                    source.OpenBlock();
-                }
-                using (source.StartBlock($"public partial class {type.Name}Builder"))
-                {
-                    foreach (var prop in type.GetMembers().OfType<IPropertySymbol>())
+                    foreach (var prop in type.Properties)
                     {
-                        AddProperty(source, prop, type.Name + "Builder");
+                        AddProperty(source, prop, type.Name);
                     }
 
                     AddBuildMethod(source, type);
                 }
-                if (!type.ContainingNamespace.IsGlobalNamespace)
-                {
-                    source.CloseBlock();
-                }
 
-                context.AddSource(GeneratorUtilities.GetHintName(type) + "Builder.g.cs", source);
+                context.AddSource(type.HintName + ".g.cs", source);
             }
         }
 
@@ -52,42 +43,53 @@ public sealed partial class PocomanGenerator
             var t = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
             source.AppendLine($"private bool _{n}_isSet;");
-            source.AppendLine($"private global::System.Lazy<{t}> _{n} = new global::System.Lazy<{t}>(() => default);");
-            source.AppendLine($"public {builderName} With{n}({t} value) => With{n}(() => value);");
-            using (source.StartBlock($"public {builderName} With{n}(global::System.Func<{t}> func)"))
+            source.AppendLine($"private {t} _{n} = default;");
+            using (source.StartBlock($"public {builderName} With{n}({t} value)"))
             {
-                source.AppendLine($"_{n} = new global::System.Lazy<{t}>(func);");
+                source.AppendLine($"_{n} = value;");
                 source.AppendLine($"_{n}_isSet = true;");
                 source.AppendLine($"return this;");
             }
         }
 
-        private static void AddBuildMethod(CodeBuilder source, INamedTypeSymbol type)
+        private static void AddBuildMethod(CodeBuilder source, TypeModel type)
         {
-            var t = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var t = type.FullType;
+
+            var initers = new List<string>();
+            var otherSetters = new List<IPropertySymbol>();
+
+            foreach (var prop in type.Properties)
+            {
+                if (prop.SetMethod is null) continue;
+
+                var n = prop.Name;
+                var pt = prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                if (prop.IsRequired)
+                    initers.Add($"{n} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
+                else if (prop.SetMethod?.IsInitOnly == true)
+                    initers.Add($"{n} = _{n}_isSet ? _{n} : default");
+                else
+                    otherSetters.Add(prop);
+            }
 
             using (source.StartBlock($"public {t} Build()"))
             {
-                source.AppendLine($"return new {t}()");
+                source.AppendLine($"var build = new {t}()");
                 source.AppendLine("{").IncreaseIndent();
-
-                var initers = new List<string>();
-                foreach (var prop in type.GetMembers().OfType<IPropertySymbol>())
-                {
-                    var n = prop.Name;
-                    var pt = prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    if (prop.IsRequired)
-                        initers.Add($"{n} = _{n}_isSet ? _{n}.Value : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
-                    else
-                        initers.Add($"{n} = _{n}_isSet ? _{n}.Value : default");
-                }
                 for (var i = 0; i < initers.Count; i++)
-                {
                     source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
+                source.DecreaseIndent().AppendLine("};");
+
+                for (var i = 0; i < otherSetters.Count; i++)
+                {
+                    var n = otherSetters[i].Name;
+                    source.AppendLine($"if (_{n}_isSet)");
+                    source.IncreaseIndent().AppendLine($"build.{n} = _{n};").DecreaseIndent();
                 }
 
-                source.DecreaseIndent().AppendLine("};");
+                source.AppendLine("return build;");
             }
         }
     }
