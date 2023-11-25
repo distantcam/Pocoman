@@ -8,7 +8,8 @@ internal record struct TypeModel(
     string HintName,
 
     IReadOnlyList<string> TypeDeclarations,
-    EquatableList<IPropertySymbol> Properties
+    EquatableList<IPropertySymbol> Properties,
+    EquatableList<IMethodSymbol> Constructors
 ) : IPartialTypeModel
 {
     public static TypeModel Create(INamedTypeSymbol type, ImmutableArray<AttributeData> attributes)
@@ -25,7 +26,8 @@ internal record struct TypeModel(
                 HintName: GeneratorUtilities.GetHintName(type) + "Builder",
 
                 TypeDeclarations: new EquatableList<string>(typeDeclarations),
-                Properties: new(type.GetMembers().OfType<IPropertySymbol>())
+                Properties: new(type.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public)),
+                Constructors: new(type.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
             );
         }
 
@@ -38,7 +40,8 @@ internal record struct TypeModel(
             HintName: GeneratorUtilities.GetHintName(type),
 
             TypeDeclarations: GeneratorUtilities.GetTypeDeclarations(type),
-            Properties: new(targetType.GetMembers().OfType<IPropertySymbol>())
+            Properties: new(targetType.GetMembers().OfType<IPropertySymbol>()),
+            Constructors: new(targetType.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
         );
     }
 }

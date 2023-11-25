@@ -10,6 +10,16 @@
 
 public partial class BasicBuilder
 {
+	private global::System.Func<global::Basic> _builder;
+	public BasicBuilder()
+	{
+		_builder = () => new()
+		{
+			IsRequired = _IsRequired_isSet ? _IsRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
+			StringInit = _StringInit_isSet ? _StringInit : default,
+			NumberInit = _NumberInit_isSet ? _NumberInit : default
+		};
+	}
 	private bool _IsRequired_isSet;
 	private string _IsRequired = default;
 	public BasicBuilder WithIsRequired(string value)
@@ -44,12 +54,7 @@ public partial class BasicBuilder
 	}
 	public global::Basic Build()
 	{
-		var build = new global::Basic()
-		{
-			IsRequired = _IsRequired_isSet ? _IsRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
-			StringInit = _StringInit_isSet ? _StringInit : default,
-			NumberInit = _NumberInit_isSet ? _NumberInit : default
-		};
+		var build = _builder();
 		if (_Standard_isSet)
 			build.Standard = _Standard;
 		return build;

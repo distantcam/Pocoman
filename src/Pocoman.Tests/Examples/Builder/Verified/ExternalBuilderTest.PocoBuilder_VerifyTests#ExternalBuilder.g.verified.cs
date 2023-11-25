@@ -10,6 +10,16 @@
 
 partial class ExternalBuilder
 {
+	private global::System.Func<global::External> _builder;
+	public ExternalBuilder()
+	{
+		_builder = () => new()
+		{
+			IsRequired = _IsRequired_isSet ? _IsRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
+			StringInit = _StringInit_isSet ? _StringInit : default,
+			NumberInit = _NumberInit_isSet ? _NumberInit : default
+		};
+	}
 	private bool _IsRequired_isSet;
 	private string _IsRequired = default;
 	public ExternalBuilder WithIsRequired(string value)
@@ -44,12 +54,7 @@ partial class ExternalBuilder
 	}
 	public global::External Build()
 	{
-		var build = new global::External()
-		{
-			IsRequired = _IsRequired_isSet ? _IsRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
-			StringInit = _StringInit_isSet ? _StringInit : default,
-			NumberInit = _NumberInit_isSet ? _NumberInit : default
-		};
+		var build = _builder();
 		if (_Standard_isSet)
 			build.Standard = _Standard;
 		return build;

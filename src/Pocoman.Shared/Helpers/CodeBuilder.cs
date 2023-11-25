@@ -63,10 +63,10 @@ internal class CodeBuilder
         IncreaseIndent();
         return this;
     }
-    public CodeBuilder CloseBlock()
+    public CodeBuilder CloseBlock(string end = "}")
     {
         DecreaseIndent();
-        AppendLine("}");
+        AppendLine(end);
         return this;
     }
 
@@ -103,15 +103,15 @@ internal class CodeBuilder
             OpenBlock();
         }
 
-        return new CloseBlockDisposable(this, typeModel.TypeDeclarations.Count + (typeModel.Namespace != null ? 1 : 0));
+        return new CloseBlockDisposable(this, typeModel.TypeDeclarations.Count + (typeModel.Namespace != null ? 1 : 0), "}");
     }
 
-    public IDisposable StartBlock(string? line = null)
+    public IDisposable StartBlock(string? line = null, string end = "}")
     {
         if (!string.IsNullOrEmpty(line))
             AppendLine(line!);
         OpenBlock();
-        return new CloseBlockDisposable(this, 1);
+        return new CloseBlockDisposable(this, 1, end);
     }
 
     public static implicit operator SourceText(CodeBuilder codeBuilder)
@@ -121,7 +121,8 @@ internal class CodeBuilder
     {
         private readonly CodeBuilder _codeBuilder;
         private readonly int _count;
-        public CloseBlockDisposable(CodeBuilder codeBuilder, int count) { _codeBuilder = codeBuilder; _count = count; }
-        public void Dispose() { for (var i = 0; i < _count; i++) _codeBuilder.CloseBlock(); }
+        private readonly string _end;
+        public CloseBlockDisposable(CodeBuilder codeBuilder, int count, string end) { _codeBuilder = codeBuilder; _count = count; _end = end; }
+        public void Dispose() { for (var i = 0; i < _count; i++) _codeBuilder.CloseBlock(_end); }
     }
 }

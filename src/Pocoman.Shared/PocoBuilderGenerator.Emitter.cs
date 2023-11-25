@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using static Microsoft.CodeAnalysis.SymbolDisplayFormat;
 
 namespace Pocoman;
 
@@ -23,15 +24,29 @@ public sealed partial class PocoBuilderGenerator
                     .AppendHeader()
                     .AppendLine();
 
+                var initers = new List<string>();
+                var otherSetters = new List<IPropertySymbol>();
+                foreach (var prop in type.Properties)
+                {
+                    if (prop.SetMethod is null) continue;
+
+                    var n = prop.Name;
+                    var pt = prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                    if (prop.IsRequired)
+                        initers.Add($"{n} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
+                    else if (prop.SetMethod?.IsInitOnly == true)
+                        initers.Add($"{n} = _{n}_isSet ? _{n} : default");
+                    else if (prop.SetMethod!.DeclaredAccessibility == Accessibility.Public)
+                        otherSetters.Add(prop);
+                }
+
                 using (source.StartPartialType(type))
                 {
+                    AddConstructorCalls(source, type, initers);
                     foreach (var prop in type.Properties)
-                    {
                         AddProperty(source, prop, type.Name);
-                    }
-
-                    AddBuildMethod(source, type);
-
+                    AddBuildMethod(source, type, otherSetters);
                     AddImplicitOperator(source, type);
                 }
 
@@ -57,43 +72,54 @@ public sealed partial class PocoBuilderGenerator
             }
         }
 
-        private static void AddBuildMethod(CodeBuilder source, TypeModel type)
+        private static void AddConstructorCalls(CodeBuilder source, TypeModel type, List<string> initers)
         {
-            var t = type.FullType;
+            var hasDefaultCtor = type.Constructors.Any(c => c.Parameters.Length == 0);
 
-            var initers = new List<string>();
-            var otherSetters = new List<IPropertySymbol>();
+            source.AppendLine($"private global::System.Func<{type.FullType}> _builder;");
 
-            foreach (var prop in type.Properties)
+            using (source.StartBlock($"public {type.Name}()"))
             {
-                if (prop.SetMethod is null) continue;
-
-                var n = prop.Name;
-                var pt = prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                if (prop.IsRequired)
-                    initers.Add($"{n} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
-                else if (prop.SetMethod?.IsInitOnly == true)
-                    initers.Add($"{n} = _{n}_isSet ? _{n} : default");
-                else if (prop.SetMethod!.DeclaredAccessibility == Accessibility.Public)
-                    otherSetters.Add(prop);
+                if (hasDefaultCtor)
+                    using (source.StartBlock("_builder = () => new()", "};"))
+                    {
+                        for (var i = 0; i < initers.Count; i++)
+                            source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
+                    }
+                else
+                    source.AppendLine($"_builder = () => throw new global::System.InvalidOperationException(\"A WithConstructor must be called before Build.\");");
             }
 
-            using (source.StartBlock($"public {t} Build()"))
-            {
-                source.AppendLine($"var build = new {t}()");
-                source.AppendLine("{").IncreaseIndent();
-                for (var i = 0; i < initers.Count; i++)
-                    source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
-                source.DecreaseIndent().AppendLine("};");
+            if (hasDefaultCtor && type.Constructors.Count == 1) return;
 
+            foreach (var c in type.Constructors)
+            {
+                var methodArgs = string.Join(", ", c.Parameters.Select(p => $"{p.Type.ToDisplayString(FullyQualifiedFormat)} {p.Name}"));
+                var callArgs = string.Join(", ", c.Parameters.Select(p => p.Name));
+
+                using (source.StartBlock($"public {type.Name} UsingConstructor({methodArgs})"))
+                {
+                    using (source.StartBlock($"_builder = () => new({callArgs})", "};"))
+                    {
+                        for (var i = 0; i < initers.Count; i++)
+                            source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
+                    }
+                    source.AppendLine($"return this;");
+                }
+            }
+        }
+
+        private static void AddBuildMethod(CodeBuilder source, TypeModel type, List<IPropertySymbol> otherSetters)
+        {
+            using (source.StartBlock($"public {type.FullType} Build()"))
+            {
+                source.AppendLine($"var build = _builder();");
                 for (var i = 0; i < otherSetters.Count; i++)
                 {
                     var n = otherSetters[i].Name;
                     source.AppendLine($"if (_{n}_isSet)");
                     source.IncreaseIndent().AppendLine($"build.{n} = _{n};").DecreaseIndent();
                 }
-
                 source.AppendLine("return build;");
             }
         }

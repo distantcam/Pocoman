@@ -10,11 +10,16 @@
 
 public partial class NoGenerationBuilder
 {
-	public global::NoGeneration Build()
+	private global::System.Func<global::NoGeneration> _builder;
+	public NoGenerationBuilder()
 	{
-		var build = new global::NoGeneration()
+		_builder = () => new()
 		{
 		};
+	}
+	public global::NoGeneration Build()
+	{
+		var build = _builder();
 		return build;
 	}
 	public static implicit operator global::NoGeneration(NoGenerationBuilder builder) => builder.Build();
