@@ -9,16 +9,13 @@
     <Import_RootNamespace>Pocoman.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Models\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GeneratorUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\IsExternalInit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\EquatableList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\TypeModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Emitter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PocomanGenerator.Parser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PocoBuilderGenerator.Emitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Parser.cs" />
   </ItemGroup>
 </Project>

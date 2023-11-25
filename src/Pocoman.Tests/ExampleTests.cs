@@ -16,21 +16,34 @@ public class ExampleTests
     }
 
     [Theory]
-    [MemberData(nameof(GetExamples))]
-    public Task ExamplesGeneratedCode(CodeFileTheoryData theoryData)
+    [MemberData(nameof(BuildExamples))]
+    public Task PocoBuilder_VerifyTests(CodeFileTheoryData theoryData)
     {
         var compilation = Compile(theoryData.Code);
-        var generator = new PocomanGenerator();
+        var generator = new PocoBuilderGenerator();
         var driver = CreateDriver(compilation, generator).RunGenerators(compilation);
 
         return Verify(driver, _codeVerifySettings)
-            .UseDirectory(Path.Combine("Examples", "Verified"))
+            .UseDirectory(Path.Combine("Examples", "Builder", "Verified"))
             .UseTypeName(theoryData.Name);
     }
 
     [Theory]
-    [MemberData(nameof(GetExamples))]
-    public void CodeCompilesProperly(CodeFileTheoryData theoryData)
+    [MemberData(nameof(BuildExamples))]
+    public void PocoBuilder_CompileTests(CodeFileTheoryData theoryData)
+    {
+        var ignoredWarnings = new string[] {
+        };
+
+        var compilation = Compile(theoryData.Code);
+        var generator = new PocoBuilderGenerator();
+        CreateDriver(compilation, generator)
+            .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+
+        outputCompilation.GetDiagnostics()
+            .Where(d => !ignoredWarnings.Contains(d.Id))
+            .Should().BeEmpty();
+    }
     {
         var ignoredWarnings = new string[] {
         };
@@ -50,7 +63,7 @@ public class ExampleTests
         => CSharpGeneratorDriver.Create(generators, parseOptions: c.SyntaxTrees.FirstOrDefault().Options as CSharpParseOptions);
 #elif ROSLYN_4_0 || ROSLYN_4_4
     private static GeneratorDriver CreateDriver(Compilation c, params IIncrementalGenerator[] generators)
-        => CSharpGeneratorDriver.Create(generators).WithUpdatedParseOptions(c.SyntaxTrees.FirstOrDefault().Options as CSharpParseOptions);
+        => CSharpGeneratorDriver.Create(generators).WithUpdatedParseOptions(c.SyntaxTrees.FirstOrDefault()?.Options ?? CSharpParseOptions.Default);
 #endif
 
     private static CSharpCompilation Compile(params string[] code)
@@ -76,16 +89,15 @@ public class ExampleTests
             ));
     }
 
-    public static IEnumerable<object[]> GetExamples()
+    public static IEnumerable<object[]> BuildExamples() => GetExamples("Builder");
+    private static IEnumerable<object[]> GetExamples(string dir)
     {
         var baseDir = new DirectoryInfo(Environment.CurrentDirectory)?.Parent?.Parent?.Parent;
-
         if (baseDir == null)
-        {
             yield break;
-        }
 
-        var examples = Directory.GetFiles(Path.Combine(baseDir.FullName, "Examples"), "*.cs");
+        var examples = Directory.GetFiles(Path.Combine(baseDir.FullName, "Examples", dir), "*.cs");
+
         foreach (var example in examples)
         {
             if (example.Contains(".g."))
@@ -103,8 +115,8 @@ public class ExampleTests
 
     public class CodeFileTheoryData : IXunitSerializable
     {
-        public string Code { get; set; }
-        public string Name { get; set; }
+        public string Code { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         public void Deserialize(IXunitSerializationInfo info)
         {

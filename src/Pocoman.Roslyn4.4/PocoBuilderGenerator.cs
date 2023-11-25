@@ -3,7 +3,7 @@
 namespace Pocoman;
 
 [Generator(LanguageNames.CSharp)]
-public sealed partial class PocomanGenerator : IIncrementalGenerator
+public sealed partial class PocoBuilderGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {

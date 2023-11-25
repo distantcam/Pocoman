@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Pocoman;
 
-public sealed partial class PocomanGenerator
+public sealed partial class PocoBuilderGenerator
 {
     private static class Emitter
     {

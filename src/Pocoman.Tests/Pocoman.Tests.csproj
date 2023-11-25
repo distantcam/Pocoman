@@ -32,8 +32,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Examples\*.cs" />
-    <None Include="Examples\*.cs" />
+    <Compile Remove="Examples\**\*.cs" />
+    <None Include="Examples\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
