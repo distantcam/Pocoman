@@ -26,7 +26,7 @@ internal record struct TypeModel(
                 HintName: GeneratorUtilities.GetHintName(type) + "Builder",
 
                 TypeDeclarations: new EquatableList<string>(typeDeclarations),
-                Properties: new(type.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public)),
+                Properties: new(GetAllProperties(type)),
                 Constructors: new(type.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
             );
         }
@@ -40,8 +40,21 @@ internal record struct TypeModel(
             HintName: GeneratorUtilities.GetHintName(type),
 
             TypeDeclarations: GeneratorUtilities.GetTypeDeclarations(type),
-            Properties: new(targetType.GetMembers().OfType<IPropertySymbol>()),
+            Properties: new(GetAllProperties(targetType)),
             Constructors: new(targetType.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
         );
+    }
+
+    private static IEnumerable<IPropertySymbol> GetAllProperties(ITypeSymbol type)
+    {
+        var currentType = type;
+        while (currentType != null)
+        {
+            foreach (var p in currentType.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public))
+            {
+                yield return p;
+            }
+            currentType = currentType.BaseType;
+        }
     }
 }
