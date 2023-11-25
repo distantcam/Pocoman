@@ -17,42 +17,40 @@ public class ExampleTests
 
     [Theory]
     [MemberData(nameof(BuildExamples))]
-    public Task PocoBuilder_VerifyTests(CodeFileTheoryData theoryData)
-    {
-        var compilation = Compile(theoryData.Code);
-        var generator = new PocoBuilderGenerator();
-        var driver = CreateDriver(compilation, generator).RunGenerators(compilation);
-
-        return Verify(driver, _codeVerifySettings)
-            .UseDirectory(Path.Combine("Examples", "Builder", "Verified"))
-            .UseTypeName(theoryData.Name);
-    }
+    public Task PocoBuilder_VerifyTests(CodeFileTheoryData theoryData) =>
+        VerifyTest(theoryData, Path.Combine("Examples", "Builder", "Verified"), new PocoBuilderGenerator());
 
     [Theory]
     [MemberData(nameof(BuildExamples))]
-    public void PocoBuilder_CompileTests(CodeFileTheoryData theoryData)
+    public void PocoBuilder_CompileTests(CodeFileTheoryData theoryData) =>
+        CompileTest(theoryData, [], new PocoBuilderGenerator());
+
+    public static IEnumerable<object[]> BuildExamples() => GetExamples("Builder");
+
+    #region Support Code
+#if ROSLYN_3_11
+    private Task VerifyTest(CodeFileTheoryData theoryData, string verifyPath, params ISourceGenerator[] generators)
+#elif ROSLYN_4_0 || ROSLYN_4_4
+    private Task VerifyTest(CodeFileTheoryData theoryData, string verifyPath, params IIncrementalGenerator[] generators)
+#endif
     {
-        var ignoredWarnings = new string[] {
-        };
-
         var compilation = Compile(theoryData.Code);
-        var generator = new PocoBuilderGenerator();
-        CreateDriver(compilation, generator)
-            .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
+        var driver = CreateDriver(compilation, generators).RunGenerators(compilation);
 
-        outputCompilation.GetDiagnostics()
-            .Where(d => !ignoredWarnings.Contains(d.Id))
-            .Should().BeEmpty();
+        return Verify(driver, _codeVerifySettings)
+            .UseDirectory(verifyPath)
+            .UseTypeName(theoryData.Name);
     }
+
+#if ROSLYN_3_11
+    private Task CompileTest(CodeFileTheoryData theoryData, string[] ignoredWarnings, params ISourceGenerator[] generators)
+#elif ROSLYN_4_0 || ROSLYN_4_4
+    private void CompileTest(CodeFileTheoryData theoryData, string[] ignoredWarnings, params IIncrementalGenerator[] generators)
+#endif
     {
-        var ignoredWarnings = new string[] {
-        };
-
         var compilation = Compile(theoryData.Code);
-        var generator = new PocomanGenerator();
-        CreateDriver(compilation, generator)
+        CreateDriver(compilation, generators)
             .RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out _);
-
         outputCompilation.GetDiagnostics()
             .Where(d => !ignoredWarnings.Contains(d.Id))
             .Should().BeEmpty();
@@ -89,7 +87,6 @@ public class ExampleTests
             ));
     }
 
-    public static IEnumerable<object[]> BuildExamples() => GetExamples("Builder");
     private static IEnumerable<object[]> GetExamples(string dir)
     {
         var baseDir = new DirectoryInfo(Environment.CurrentDirectory)?.Parent?.Parent?.Parent;
@@ -132,4 +129,5 @@ public class ExampleTests
 
         public override string ToString() => Name + ".cs";
     }
+    #endregion
 }

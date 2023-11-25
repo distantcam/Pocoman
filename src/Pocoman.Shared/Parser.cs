@@ -6,7 +6,6 @@ namespace Pocoman;
 public static class Parser
 {
     public const string PocoBuilderAttributeFullName = "Pocoman.PocoBuilderAttribute";
-    public const string PocoMappedAttributeFullName = "Pocoman.PocoMappedAttribute";
 
     public static bool IsTypeDeclaration(SyntaxNode node, CancellationToken cancellationToken)
         => node is TypeDeclarationSyntax { AttributeLists.Count: > 0 };
