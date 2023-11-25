@@ -36,6 +36,13 @@ public partial class CtorBuilder
 		};
 		return this;
 	}
+	public CtorBuilder UsingConstructor(int number, bool flag = true, string blank = null, string empty = "", string foo = "foo")
+	{
+		_builder = () => new(number, flag, blank, empty, foo)
+		{
+		};
+		return this;
+	}
 	public global::Ctor Build()
 	{
 		var build = _builder();

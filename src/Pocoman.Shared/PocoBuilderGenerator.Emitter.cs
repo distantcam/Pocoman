@@ -94,9 +94,9 @@ public sealed partial class PocoBuilderGenerator
 
             foreach (var c in type.Constructors)
             {
-                var methodArgs = string.Join(", ", c.Parameters.Select(p => $"{p.Type.ToDisplayString(FullyQualifiedFormat)} {p.Name}"));
+                var methodArgs = string.Join(", ", c.Parameters.Select(p =>
+                    $"{p.Type.ToDisplayString(FullyQualifiedFormat)} {p.Name}{DefaultCode(p)}"));
                 var callArgs = string.Join(", ", c.Parameters.Select(p => p.Name));
-
                 using (source.StartBlock($"public {type.Name} UsingConstructor({methodArgs})"))
                 {
                     using (source.StartBlock($"_builder = () => new({callArgs})", "};"))
@@ -127,6 +127,20 @@ public sealed partial class PocoBuilderGenerator
         private static void AddImplicitOperator(CodeBuilder source, TypeModel type)
         {
             source.AppendLine($"public static implicit operator {type.FullType}({type.Name} builder) => builder.Build();");
+        }
+
+        private static string DefaultCode(IParameterSymbol parameter)
+        {
+            if (!parameter.HasExplicitDefaultValue) return "";
+
+            if (parameter.ExplicitDefaultValue == null)
+                return " = null";
+            if (parameter.ExplicitDefaultValue is bool)
+                return " = " + parameter.ExplicitDefaultValue.ToString().ToLowerInvariant();
+            if (parameter.ExplicitDefaultValue is string)
+                return " = \"" + parameter.ExplicitDefaultValue.ToString() + "\"";
+
+            return " = " + parameter.ExplicitDefaultValue.ToString();
         }
     }
 }

@@ -6,12 +6,5 @@ public class Ctor
     public Ctor(int number) { }
     public Ctor(string name) { }
     public Ctor(int number, string name) { }
-}
-
-[PocoBuilder]
-public class CtorWithDefault
-{
-    public CtorWithDefault() { }
-    public CtorWithDefault(int number) { }
-    public CtorWithDefault(string name) { }
+    public Ctor(int number, bool flag = true, string blank = null, string empty = "", string foo = "foo") { }
 }
