@@ -11,37 +11,29 @@
 public partial class CtorBuilder
 {
 	private global::System.Func<global::Ctor> _builder;
-	public CtorBuilder()
-	{
-		_builder = () => throw new global::System.InvalidOperationException("A WithConstructor must be called before Build.");
-	}
-	public CtorBuilder UsingConstructor(int number)
+	public CtorBuilder(int number)
 	{
 		_builder = () => new(number)
 		{
 		};
-		return this;
 	}
-	public CtorBuilder UsingConstructor(string name)
+	public CtorBuilder(string name)
 	{
 		_builder = () => new(name)
 		{
 		};
-		return this;
 	}
-	public CtorBuilder UsingConstructor(int number, string name)
+	public CtorBuilder(int number, string name)
 	{
 		_builder = () => new(number, name)
 		{
 		};
-		return this;
 	}
-	public CtorBuilder UsingConstructor(int number, bool flag = true, string blank = null, string empty = "", string foo = "foo")
+	public CtorBuilder(int number, bool flag = true, string blank = null, string empty = "", string foo = "foo")
 	{
 		_builder = () => new(number, flag, blank, empty, foo)
 		{
 		};
-		return this;
 	}
 	public global::Ctor Build()
 	{

@@ -78,33 +78,18 @@ public sealed partial class PocoBuilderGenerator
 
             source.AppendLine($"private global::System.Func<{type.FullType}> _builder;");
 
-            using (source.StartBlock($"public {type.Name}()"))
-            {
-                if (hasDefaultCtor)
-                    using (source.StartBlock("_builder = () => new()", "};"))
-                    {
-                        for (var i = 0; i < initers.Count; i++)
-                            source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
-                    }
-                else
-                    source.AppendLine($"_builder = () => throw new global::System.InvalidOperationException(\"A WithConstructor must be called before Build.\");");
-            }
-
-            if (hasDefaultCtor && type.Constructors.Count == 1) return;
-
             foreach (var c in type.Constructors)
             {
                 var methodArgs = string.Join(", ", c.Parameters.Select(p =>
                     $"{p.Type.ToDisplayString(FullyQualifiedFormat)} {p.Name}{DefaultCode(p)}"));
                 var callArgs = string.Join(", ", c.Parameters.Select(p => p.Name));
-                using (source.StartBlock($"public {type.Name} UsingConstructor({methodArgs})"))
+                using (source.StartBlock($"public {type.Name}({methodArgs})"))
                 {
                     using (source.StartBlock($"_builder = () => new({callArgs})", "};"))
                     {
                         for (var i = 0; i < initers.Count; i++)
                             source.AppendLine(initers[i] + (i < initers.Count - 1 ? "," : ""));
                     }
-                    source.AppendLine($"return this;");
                 }
             }
         }
