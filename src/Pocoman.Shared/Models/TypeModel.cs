@@ -14,34 +14,33 @@ internal record struct TypeModel(
 {
     public static TypeModel Create(INamedTypeSymbol type, ImmutableArray<AttributeData> attributes)
     {
-        if (attributes.All(a => a.ConstructorArguments.IsDefaultOrEmpty))
+        var defaultAttribute = attributes.All(a => a.ConstructorArguments.IsDefaultOrEmpty);
+
+        var targetType = defaultAttribute
+            ? type
+            : (INamedTypeSymbol)attributes.First().ConstructorArguments.First().Value!;
+        var typeDeclarations = GeneratorUtilities.GetTypeDeclarations(type).ToList();
+        var name =  type.Name;
+        var hintName = GeneratorUtilities.GetHintName(type);
+
+        if (defaultAttribute)
         {
-            var typeDeclarations = GeneratorUtilities.GetTypeDeclarations(type).ToList();
-            typeDeclarations[0] = $"public {typeDeclarations[0]}Builder";
-
-            return new(
-                Namespace: GeneratorUtilities.GetNamespace(type),
-                Name: type.Name + "Builder",
-                FullType: type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                HintName: GeneratorUtilities.GetHintName(type) + "Builder",
-
-                TypeDeclarations: new EquatableList<string>(typeDeclarations),
-                Properties: new(GetAllProperties(type)),
-                Constructors: new(type.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
-            );
+            var lastIndex = typeDeclarations.Count - 1;
+            typeDeclarations[lastIndex] = $"public {typeDeclarations[lastIndex]}Builder";
+            name += "Builder";
+            hintName += "Builder";
         }
-
-        var targetType = (INamedTypeSymbol)attributes.First().ConstructorArguments.First().Value!;
 
         return new(
             Namespace: GeneratorUtilities.GetNamespace(type),
-            Name: type.Name,
+            Name: name,
             FullType: targetType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            HintName: GeneratorUtilities.GetHintName(type),
+            HintName: hintName,
 
-            TypeDeclarations: GeneratorUtilities.GetTypeDeclarations(type),
+            TypeDeclarations: new EquatableList<string>(typeDeclarations),
             Properties: new(GetAllProperties(targetType)),
-            Constructors: new(targetType.InstanceConstructors.Where(c => c.DeclaredAccessibility == Accessibility.Public))
+            Constructors: new(targetType.InstanceConstructors
+                .Where(c => c.DeclaredAccessibility == Accessibility.Public))
         );
     }
 
