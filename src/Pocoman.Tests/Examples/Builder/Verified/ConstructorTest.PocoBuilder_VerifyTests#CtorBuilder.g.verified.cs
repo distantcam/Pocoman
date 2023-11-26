@@ -11,6 +11,12 @@
 public partial class CtorBuilder
 {
 	private global::System.Func<global::Ctor> _builder;
+	public CtorBuilder()
+	{
+		_builder = () => new()
+		{
+		};
+	}
 	public CtorBuilder(int number)
 	{
 		_builder = () => new(number)

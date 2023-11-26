@@ -53,4 +53,12 @@ internal static class Extensions
         }
         return false;
     }
+
+    public static string ToCamelCase(this string s) => string.IsNullOrEmpty(s)
+        ? ""
+        : char.ToLower(s[0]) + s.Substring(1);
+
+    public static string ToPascalCase(this string s) => string.IsNullOrEmpty(s)
+        ? ""
+        : char.ToUpper(s[0]) + s.Substring(1);
 }

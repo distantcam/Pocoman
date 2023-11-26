@@ -17,39 +17,39 @@ public partial class ClassCBuilder
 		{
 		};
 	}
-	private bool _C_isSet;
-	private string _C = default;
+	private bool _c_isSet;
+	private string _c = default;
 	public ClassCBuilder WithC(string value)
 	{
-		_C = value;
-		_C_isSet = true;
+		_c = value;
+		_c_isSet = true;
 		return this;
 	}
-	private bool _B_isSet;
-	private string _B = default;
+	private bool _b_isSet;
+	private string _b = default;
 	public ClassCBuilder WithB(string value)
 	{
-		_B = value;
-		_B_isSet = true;
+		_b = value;
+		_b_isSet = true;
 		return this;
 	}
-	private bool _A_isSet;
-	private string _A = default;
+	private bool _a_isSet;
+	private string _a = default;
 	public ClassCBuilder WithA(string value)
 	{
-		_A = value;
-		_A_isSet = true;
+		_a = value;
+		_a_isSet = true;
 		return this;
 	}
 	public global::ClassC Build()
 	{
 		var build = _builder();
-		if (_C_isSet)
-			build.C = _C;
-		if (_B_isSet)
-			build.B = _B;
-		if (_A_isSet)
-			build.A = _A;
+		if (_c_isSet)
+			build.C = _c;
+		if (_b_isSet)
+			build.B = _b;
+		if (_a_isSet)
+			build.A = _a;
 		return build;
 	}
 	public static implicit operator global::ClassC(ClassCBuilder builder) => builder.Build();

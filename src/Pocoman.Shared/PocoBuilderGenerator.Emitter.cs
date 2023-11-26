@@ -30,13 +30,13 @@ public sealed partial class PocoBuilderGenerator
                 {
                     if (prop.SetMethod is null) continue;
 
-                    var n = prop.Name;
+                    var n = prop.Name.ToCamelCase();
                     var pt = prop.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
                     if (prop.IsRequired)
-                        initers.Add($"{n} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{n}\\\" ({pt}) must be set before build can be called.\")");
+                        initers.Add($"{prop.Name} = _{n}_isSet ? _{n} : throw new global::System.InvalidOperationException(\"Property \\\"{prop.Name}\\\" ({pt}) must be set before build can be called.\")");
                     else if (prop.SetMethod?.IsInitOnly == true)
-                        initers.Add($"{n} = _{n}_isSet ? _{n} : default");
+                        initers.Add($"{prop.Name} = _{n}_isSet ? _{n} : default");
                     else if (prop.SetMethod!.DeclaredAccessibility == Accessibility.Public)
                         otherSetters.Add(prop);
                 }
@@ -59,12 +59,12 @@ public sealed partial class PocoBuilderGenerator
             if (property.SetMethod?.DeclaredAccessibility != Accessibility.Public)
                 return;
 
-            var n = property.Name;
+            var n = property.Name.ToCamelCase();
             var t = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
             source.AppendLine($"private bool _{n}_isSet;");
             source.AppendLine($"private {t} _{n} = default;");
-            using (source.StartBlock($"public {builderName} With{n}({t} value)"))
+            using (source.StartBlock($"public {builderName} With{property.Name}({t} value)"))
             {
                 source.AppendLine($"_{n} = value;");
                 source.AppendLine($"_{n}_isSet = true;");
@@ -99,11 +99,11 @@ public sealed partial class PocoBuilderGenerator
             using (source.StartBlock($"public {type.FullType} Build()"))
             {
                 source.AppendLine($"var build = _builder();");
-                for (var i = 0; i < otherSetters.Count; i++)
+                foreach (var property in otherSetters)
                 {
-                    var n = otherSetters[i].Name;
+                    var n = property.Name.ToCamelCase();
                     source.AppendLine($"if (_{n}_isSet)");
-                    source.IncreaseIndent().AppendLine($"build.{n} = _{n};").DecreaseIndent();
+                    source.IncreaseIndent().AppendLine($"build.{property.Name} = _{n};").DecreaseIndent();
                 }
                 source.AppendLine("return build;");
             }

@@ -3,6 +3,7 @@
 [PocoBuilder]
 public class Ctor
 {
+    public Ctor() { }
     public Ctor(int number) { }
     public Ctor(string name) { }
     public Ctor(int number, string name) { }

@@ -15,48 +15,48 @@ partial class ExternalBuilder
 	{
 		_builder = () => new()
 		{
-			IsRequired = _IsRequired_isSet ? _IsRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
-			StringInit = _StringInit_isSet ? _StringInit : default,
-			NumberInit = _NumberInit_isSet ? _NumberInit : default
+			IsRequired = _isRequired_isSet ? _isRequired : throw new global::System.InvalidOperationException("Property \"IsRequired\" (string) must be set before build can be called."),
+			StringInit = _stringInit_isSet ? _stringInit : default,
+			NumberInit = _numberInit_isSet ? _numberInit : default
 		};
 	}
-	private bool _IsRequired_isSet;
-	private string _IsRequired = default;
+	private bool _isRequired_isSet;
+	private string _isRequired = default;
 	public ExternalBuilder WithIsRequired(string value)
 	{
-		_IsRequired = value;
-		_IsRequired_isSet = true;
+		_isRequired = value;
+		_isRequired_isSet = true;
 		return this;
 	}
-	private bool _StringInit_isSet;
-	private string _StringInit = default;
+	private bool _stringInit_isSet;
+	private string _stringInit = default;
 	public ExternalBuilder WithStringInit(string value)
 	{
-		_StringInit = value;
-		_StringInit_isSet = true;
+		_stringInit = value;
+		_stringInit_isSet = true;
 		return this;
 	}
-	private bool _NumberInit_isSet;
-	private int _NumberInit = default;
+	private bool _numberInit_isSet;
+	private int _numberInit = default;
 	public ExternalBuilder WithNumberInit(int value)
 	{
-		_NumberInit = value;
-		_NumberInit_isSet = true;
+		_numberInit = value;
+		_numberInit_isSet = true;
 		return this;
 	}
-	private bool _Standard_isSet;
-	private string _Standard = default;
+	private bool _standard_isSet;
+	private string _standard = default;
 	public ExternalBuilder WithStandard(string value)
 	{
-		_Standard = value;
-		_Standard_isSet = true;
+		_standard = value;
+		_standard_isSet = true;
 		return this;
 	}
 	public global::External Build()
 	{
 		var build = _builder();
-		if (_Standard_isSet)
-			build.Standard = _Standard;
+		if (_standard_isSet)
+			build.Standard = _standard;
 		return build;
 	}
 	public static implicit operator global::External(ExternalBuilder builder) => builder.Build();
