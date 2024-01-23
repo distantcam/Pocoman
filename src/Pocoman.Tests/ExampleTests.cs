@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Pocoman;
 using Xunit.Abstractions;
 
-[UsesVerify]
 public class ExampleTests
 {
     private readonly VerifySettings _codeVerifySettings;
