@@ -16,7 +16,7 @@
     <!--<RoslynLibVersion>4.0.1</RoslynLibVersion>-->
 
     <RoslynVersion>4.4</RoslynVersion>
-    <RoslynLibVersion>4.4.0</RoslynLibVersion>
+    <RoslynLibVersion>4.9.2</RoslynLibVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RoslynVersion)' == '3.11' ">
